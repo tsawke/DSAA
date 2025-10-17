@@ -38,138 +38,85 @@ $\texttt{Q.E.D.}$.
 
 Sol:
 
+Obviously the case in description is the worst case, whose runtime is $\Theta(n^2)$.
 
+Justification: Each partition will pick the minimum element as pivot, leaving the worst partition $(1, n - 1)$, and the Partition itself is linear.
 
-## Question 4.4 (1.25 marks)
+Thus we have: $T(n) = T(n - 1) + \Theta(n)$, then solve it by substitution, we obtain $T(n) = \Theta(n^2)$.
 
-![image-20251011225755866](./assets/image-20251011225755866.png) 	
+## Question 5.4 (Marks: 0.5)
 
-1. PF: Assuming the height is $h$. In the HINT condition, the size of left subtree is:
-   $$
-   \sum_{i = 0}^{h - 1}2^i = 2^h - 1
-   $$
-   And for the right subtree, for its last level is empty, the size is:
-   $$
-   \sum_{i = 0}^{h - 2}2^i = 2^{h - 1} - 1
-   $$
-   The the total size is:
-   $$
-   (2^h - 1) + (2^{h - 1} - 1) + 1 = \dfrac{3}{2} \cdot 2^h - 1
-   $$
-   Thus, we have:
-   $$
-   \dfrac{2}{3} (\dfrac{3}{2} \cdot 2^h - 1) \ge 2^h - 1
-   $$
-   Which is to say, the size of the subtree is at most $\dfrac{2}{3}n$ nodes.
+![image-20251017190055680](./assets/image-20251017190055680.png) 	
 
-   $\texttt{Q.E.D.}$.
+Sol: $q = r$, for each elements satisfy $A[j] \le x$, thus $i \leftarrow i + 1$ will always be executed, thus Partition will return $r$.
 
-2. Sol: We have $a = 1, b = \dfrac{2}{3}, f(n) = \Theta(1)$.
+The runtime will be $\Theta(n^2)$, similiar to Question 5.3, this situation will leave the worst partition $(1, n - 1)$, and the Partition itself is linear. Thus we have: $T(n) = T(n - 1) + \Theta(n)$, then solve it by substitution, we obtain $T(n) = \Theta(n^2)$.
 
-   Watershed: $n^{\log_b^a} = 1 = \Theta(1)$, thus let $k = 0$, $f(n) = \Theta(n^{\log_b^a}\lg^k n) = \Theta(1)$.
+## Question 5.5 (Marks: 0.5)
 
-   Therefore, $T(n) = \Theta(\log n)$.
+![image-20251017193151873](./assets/image-20251017193151873.png)
 
-## Question 4.5 (1 mark)
+Sol:
 
-![image-20251011234114357](./assets/image-20251011234114357.png)
-
-PF: For BuildMaxHeap, obviously its runtime aggregates to $\Theta(n)$. 
-
-To prove this, we can do the following calculation:
-
-Let $k$ be the height of a level, then there are approximately $\dfrac{n}{2^k}$ nodes at this height, then:
-$$
-\sum_{k\ge 1}\frac{n}{2^{k}}\cdot O(k) = n \cdot O\Big(\sum_{k\ge 1}\frac{k}{2^{k}}\Big) = n\cdot O(2) = \Theta(n).
-$$
-
-
-Then we will do some $\Theta(1)$ operations and Heapify $n - 1$ times. At this time, for the array is sorted, the element swaped to the top will be heapify to the bottom, thus the cost of Heapify is $\Omega(height) = \Omega(\log n)$.
-
-Then, we have:
-$$
-\sum_{i=2}^{n}\Omega(\log i) = \Omega\Big(\sum_{i=2}^{n}\log i\Big) \ge \Omega\Big(\Big\lfloor \frac{n}{2}\Big\rfloor \cdot \log\Big(\frac{n}{2}\Big) \Big)= \Omega(n\log n).
-$$
-Also, we can use the Stirling Formula: $\log(n!) = n \log n - n + O(\log n)$.
-
-Eventually, the runtime is:
-$$
-\Theta(n) + \Theta(1) \cdot (n - 1) + \Omega(n \log n) = \Omega(n \log n)
-$$
-$\texttt{Q.E.D.}$.
-
-## Question 4.6 (0.45 marks)
-
-![image-20251011234545871](./assets/image-20251011234545871.png)
-
-![image-20251011234600950](./assets/image-20251011234600950.png)
+Code in C++:
 
 ```cpp
-int main(){
-    int T = read();
-    while(T--){
-        int N = read();
-        vector < int > val(N + 10, 0), cur(N + 10, 0);
-        for(int i = 1; i <= N; ++i)val[i] = read();
-        for(int i = 1; i <= N; ++i)cur[i] = read();
-        basic_string < char > ans;
-        bool poss(true);
-        for(int i = N; i >= 1; --i){
-            int mx(INT_MIN), mn(INT_MAX);
-            int mxHeap(-1), mnHeap(-1);
-            for(int p = i; p >= 1; p >>= 1){
-                if(cur[p] == val[i]){
-                    if((p == 1 || cur[p >> 1] >= val[i]) && cur[p] > mx)mxHeap = p;
-                    if((p == 1 || cur[p >> 1] <= val[i]) && cur[p] < mn)mnHeap = p;
-                }mx = max(mx, cur[p]), mn = min(mn, cur[p]);
-            }
-            int res(-1);
-            if(~mnHeap)ans += '0', res = mnHeap;
-            else if(~mxHeap)ans += '1', res = mxHeap;
-            else{poss = false; break;}
-
-            int lst(cur[i]);
-            for(int p = i; p > res; p >>= 1){
-                int tmp = cur[p >> 1];
-                cur[p >> 1] = lst;
-                lst = tmp;
-            }
-        }
-        if(!poss)printf("Impossible\n");
-        else reverse(ans.begin(), ans.end()), printf("%s\n", ans.c_str());
+auto Partition = [](vector < int > &A, int l, int r)->pair < int, int >{
+    int pivot(A[r]);
+    int spl1(l - 1), spl2(r - 1);
+    int cur(l);
+    while(cur <= spl2){
+        if(A[cur] < pivot)swap(A[++spl1], A[cur++]);
+        else if(A[cur] > pivot)swap(A[cur], A[spl2--]);
+        else ++cur;
     }
-
-    // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
-    return 0;
-}
+    swap(A[++spl2], A[r]);
+    return {spl1 + 1, spl2};
+};
 ```
+
+Explaination: `cur` will traverse each elements in $A[l, r - 1]$, if it's less than pivot, then $spl1 \leftarrow spl1 + 1$, and we implement the swap, i.e., the element will be placed in the less range. Simutaneously, if it's larger, it will be replaced to the last $spl2$, which is the edge of the larger range. And for equal elements will be left between the two $spl$. Finally, swap the pivot to the rightest of the middle range. Therefore, we have $A[l, spl1] < A[spl1 + 1, spl2] < A[spl2 + 1, r]$, which satisfy the description, and the runtime is trivially linear, for $spl2 - cur$ will definitely decrease in each while loop dur to the `cur++`, `spl2--` and `++cur`, thus the algorithm must terminate in linear runtime.
+
+Code in C++:
+
+```cpp
+auto QuickSort = [&](auto&& self, vector < int > &A, int l, int r)->void{
+    if(l >= r)return;
+    auto [spl1, spl2] = Partition(A, l, r);
+    self(self, A, l, spl1 - 1);
+    self(self, A, spl2 + 1, r);
+};
+```
+
+The runtime will be $\Theta(n)$, for Partition' will return `{l, r}` because all the elements are equal to the pivot, then the QuickSort' will not enter the recursion. Thus the runtime will only be once of the Partition'. which is $\Theta(n)$. 
+
+## Question 5.6 (Marks: 0.5)
+
+![image-20251017200323389](./assets/image-20251017200323389.png)
+
+![image-20251017200337269](./assets/image-20251017200337269.png)
 
 ```cpp
 int main(){
     int N = read();
-    multiset < int > S;
-    vector < string > res;
-    while(N--){
-        string opt; cin >> opt;
-        if(opt == "insert"){
-            int val = read();
-            S.insert(val);
-            res.push_back("insert " + to_string(val));
-        }
-        if(opt == "removeMin"){
-            if(S.empty())res.push_back("insert 1");
-            else S.erase(S.begin());
-            res.push_back("removeMin");
-        }
-        if(opt == "getMin"){
-            int val = read();
-            while(!S.empty() && *S.begin() < val)res.push_back("removeMin"), S.erase(S.begin());
-            if(S.empty() || *S.begin() > val)res.push_back("insert " + to_string(val)), S.insert(val);
-            res.push_back("getMin " + to_string(val));
-        }
-    }
-    printf("%d\n", (int)res.size());
-    for(auto &s : res)cout << s << endl;
+    vector < int > A(N + 10, 0);
+    for(int i = 1; i <= N; ++i)A[i] = read();
+    auto Partition = [](vector < int > &A, int l, int r)->int{
+        int val(A[r]);
+        int spl(l - 1);
+        for(int i = l; i <= r - 1; ++i)
+            if(A[i] <= val)swap(A[++spl], A[i]);
+        swap(A[++spl], A[r]);
+        return spl;
+    };
+    auto QuickSort = [&](auto&& self, vector < int > &A, int l, int r)->void{
+        if(l >= r)return;
+        int spl = Partition(A, l, r);
+        self(self, A, l, spl - 1);
+        self(self, A, spl + 1, r);
+    }; QuickSort(QuickSort, A, 1, N);
+
+    for(int i = 1; i <= N; ++i)printf("%d%c", A[i], i == N ? '\n' : ' ');
 
     // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
     return 0;
@@ -180,24 +127,31 @@ int main(){
 int main(){
     int N = read();
     vector < int > A(N + 10, 0);
-   
     for(int i = 1; i <= N; ++i)A[i] = read();
-    #define LS (p << 1)
-    #define RS (LS | 1)
-    auto Heapify = [&](auto &&self, int p, int len)->void{
-        int mx(p);
-        if(LS <= len && A[LS] > A[mx])mx = LS;
-        if(RS <= len && A[RS] > A[mx])mx = RS;
-        if(mx != p)swap(A[mx], A[p]), self(self, mx, len);
+    auto Partition = [](vector < int > &A, int l, int r)->pair < int, int >{
+        int pivot(A[r]);
+        int spl1(l - 1), spl2(r - 1);
+        int cur(l);
+        while(cur <= spl2){
+            if(A[cur] < pivot)swap(A[++spl1], A[cur++]);
+            else if(A[cur] > pivot)swap(A[cur], A[spl2--]);
+            else ++cur;
+        }
+        swap(A[++spl2], A[r]);
+        return {spl1 + 1, spl2};
     };
-    auto HeapSort = [&](auto &&self, int len)->void{
-        for(int i = (len >> 1); i >= 1; --i)Heapify(Heapify, i, len);
-        for(int i = len; i > 1; --i)swap(A[1], A[i]), Heapify(Heapify, 1, i - 1);
-    }; HeapSort(HeapSort, N);
+    auto QuickSort = [&](auto&& self, vector < int > &A, int l, int r)->void{
+        if(l >= r)return;
+        auto [spl1, spl2] = Partition(A, l, r);
+        self(self, A, l, spl1 - 1);
+        self(self, A, spl2 + 1, r);
+    }; QuickSort(QuickSort, A, 1, N);
+
     for(int i = 1; i <= N; ++i)printf("%d%c", A[i], i == N ? '\n' : ' ');
 
     // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
     return 0;
 }
+
 ```
 
