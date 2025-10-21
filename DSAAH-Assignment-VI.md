@@ -1,18 +1,18 @@
-# Assignment V - DSAA(H)
+# Assignment VI - DSAA(H)
 
 **Name**: Yuxuan HOU (侯宇轩)
 
 **Student ID**: 12413104
 
-**Date**: 2025.10.17
+**Date**: 2025.10.21
 
-## Question 5.1 (Marks: 0.25)
+## Question 6.1 (marks 0.5)
 
-![image-20251017035833977](./assets/image-20251017035833977.png)
+![image-20251021193937236](./assets/image-20251021193937236.png)
 
 Sol: 
 
-![image-20251017042254009](./assets/image-20251017042254009.png)
+
 
 ## Question 5.2 (Marks: 0.5)
 
