@@ -10,7 +10,31 @@
 
 ![image-20251021193937236](./assets/image-20251021193937236.png)
 
-Sol: The algorithm is **incorrect**.
+Sol: The algorithm is **correct**.
+
+1. 
+
+**Inner Loop Invariant**: Before each iteration $j$, the element $A[i]$ is greater than every elements in $A[1, j - 1]$.
+
+- **Initialization**: At the beginning, $j - 1 = 0$, the loop invariant is trivially satisfied.
+
+- **Maintenance**: In the iteration, if $A[j] > A[i]$, they will be swaped, leading that $A[i]$ remains to be the greatest.
+
+- **Termination**: When $j = n$, the loop terminate, and $A[i]$ will be the largest element of $A[1, n]$.
+
+**Outer Loop Invariant**: Before each iteration $i$, the prefix $A[1, i - 1]$ is non-decreasing.
+
+- **Initialization**: At the beginning, $i - 1 = 0$, the loop invariant is trivially satisfied.
+
+- **Maintenance**: In the iteration, after the inner loop, $A[i]$ will become the greatest
+
+- **Termination**: When $j = n$, the loop terminate, and $A[i]$ will be the largest element of $A[1, n]$.
+
+2 4 3 1
+
+1. 
+
+1. 
 
 1. Counterexample: Let $A$ be $[1, 2, 3]$, then:
 
