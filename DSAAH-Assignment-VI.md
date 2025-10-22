@@ -10,7 +10,27 @@
 
 ![image-20251021193937236](./assets/image-20251021193937236.png)
 
-Sol: 
+Sol: The algorithm is **incorrect**.
+
+1. Counterexample: Let $A$ be $[1, 2, 3]$, then:
+
+   For $i = 1, j = 1$, we have $1 = 1$, $A = [1, 2, 3]$.
+
+   For $i = 1, j = 2$, we have $1 < 2$, $A = [2, 1, 3]$.
+
+   For $i = 1, j = 3$, we have $2 < 3$, $A = [3, 1, 2]$.
+
+   For $i = 2, j = 1$, we have $1 < 3$, $A = [1, 3, 2]$.
+
+   For $i = 2, j = 2$, we have $3 = 3$, $A = [1, 3, 2]$.
+
+   For $i = 2, j = 3$, we have $3 > 2$, $A = [1, 3, 2]$.
+
+   For $i = 3, j = 1$, we have $2 > 1$, $A = [1, 3, 2]$.
+
+   For $i = 3, j = 2$, we have $2 < 3$, $A = [1, 3, 2]$.
+
+   For $i = 2, j = 2$, we have $3 = 3$, $A = [1, 3, 2]$.
 
 
 
