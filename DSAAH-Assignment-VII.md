@@ -62,125 +62,97 @@ Sol:
 
 ![image-20251027120825147](./assets/image-20251027120825147.png)
 
-Explaination: We are using `CountingRange-Init` to preprocess the prefix summations of $C[i]$, then 
+Explaination: We are using `CountingRange-Init` to preprocess the prefix summations of $C[i]$, obviously its runtime is $\Theta(n + k)$. For queries, use `CountingRange-Query`, which can return the answer by subtraction on prefix summations $S$ in $\Theta(1)$ runtime.
 
-## Question 6.5 (0.5 marks)
+## Question 7.5 (marks 0.25)
 
-![image-20251023030149439](./assets/image-20251023030149439.png)
+![image-20251027141356428](./assets/image-20251027141356428.png)
 
-Sol: Obvoiusly it's $n - 1$.
+![image-20251027141402916](./assets/image-20251027141402916.png)
 
-We obtain that each comparison represents one depth deeper, and if we want to finish a comparison sort, we need to clarify the minimum element at least. And the process of clarifying the minimum needs at least $n - 1$ comparisons, thus the smallest possible depth is $n - 1$.
+Sol: 
 
-## Question 6.6 (0.25 marks)
+1. StableSort by 3rd letter:
 
-![image-20251023033948645](./assets/image-20251023033948645.png)
+Bucket: $B < G < R < W < X$.
 
-![image-20251023034005670](./assets/image-20251023034005670.png)
+Result: $\text{MOB, TAB, DOG, TUG, PIG, BIG, BAR, CAR, TAR, COW, ROW, WOW, BOX}$.
+
+2. StableSort by 2nd letter:
+
+Bucket: $A < I < O < U$.
+
+Result: $\text{TAB, BAR, CAR, TAR, PIG, BIG, MOB, DOG, COW, ROW, WOW, BOX, TUG}$.
+
+3. StableSort by 1st letter:
+
+Bucket: $B < C < D < M < P < R < T < W$.
+
+Result: $\text{BAR, BIG, BOX, CAR, COW, DOG, MOB, PIG, ROW, TAB, TAR, TUG, WOW}$.
+
+## Question 7.6 (0.25 marks)
+
+![image-20251027141615967](./assets/image-20251027141615967.png)
+
+Sol:
+
+1. **Stable**.
+
+Take ascendent as example, the process of insertion is from right to left, and insert the element $A[i]$ when meeting the first $A[j] <= A[i]$, which make sure that the later elements will be placed righter, which holds stability.
+
+2. **Stable**.
+
+In MergeSort, we'll choose the elements in the left subarray first, which make sure the earlier elements will be placed lefter, which holds stability.
+
+3. **Unstable**.
+
+Example: $1, 2_1, 2_2$.
+
+First we implement `Build-Max-Heap` which will implement `Max-Heapify(A, 1)`, then $2_2$ will be swaped to $1$ as the largest. Eventually by `HeapSort` we'll get $2_2, 2_1, 1$ which is obviously unstable.
+
+4. **Unstable**.
+
+Example: $2_1, 2_2, 1$.
+
+$1$ will be chosen as pivot, and $2_1$ will be swaped with $1$, leading $1, 2_2, 2_1$, and when dealing with $2_2, 2_1$, the pivot $2_1$ will be swaped with itself, leading the final result: $1, 2_2, 2_1$, which is obviously unstable.
+
+## Question 7.7 (0.25 marks)
+
+![image-20251027142029616](./assets/image-20251027142029616.png)
+
+![image-20251027234450217](./assets/image-20251027234450217.png)
 
 ```cpp
-int main(){
-    int N = read();
-    vector < int > A(N + 10, 0);
-    for(int i = 1; i <= N; ++i)A[i] = read();
-    auto Partition = [](vector < int > &A, int l, int r)->int{
-        int val(A[r]);
-        int spl(l - 1);
-        for(int i = l; i <= r - 1; ++i)
-            if(A[i] <= val)swap(A[++spl], A[i]);
-        swap(A[++spl], A[r]);
-        return spl;
-    };
-    auto RandPartition = [&](vector < int > &A, int l, int r)->int{
-        swap(A[r], A[rndd(l, r)]);
-        return Partition(A, l, r);
-    };
-    auto RandQuickSort = [&](auto&& self, vector < int > &A, int l, int r)->void{
-        if(l >= r)return;
-        int spl = RandPartition(A, l, r);
-        self(self, A, l, spl - 1);
-        self(self, A, spl + 1, r);
-    }; RandQuickSort(RandQuickSort, A, 1, N);
-
-    for(int i = 1; i <= N; ++i)printf("%d%c", A[i], i == N ? '\n' : ' ');
-
-    // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
-    return 0;
-}
+using namespace std;
+auto Sort = [](u32 *A, int N)->void{
+    vector < basic_string < u32 > > buc(1 << 9);
+    for(int base = 1; base <= 4; ++base){
+        for(int i = 0; i < N; ++i)
+            buc[(A[i] >> (8 * (base - 1))) & ((1u << 9) - 1)] += A[i];
+        int cur(0);
+        for(auto &b : buc){
+            for(const auto &v : b)
+                A[cur++] = v;
+            b.clear();
+        }
+    }
+};
 ```
 
 ```cpp
-int N;
-
-class SegTree{
-private:
-    int mn[510000 << 2], mx[510000 << 2];
-    #define LS (p << 1)
-    #define RS (LS | 1)
-    #define MID ((gl + gr) >> 1)
-public:
-    void Clear(void){
-        for(int i = 0; i <= (N << 2) + 100; ++i)mn[i] = INT_MAX, mx[i] = INT_MIN;
-    }
-    void Pushup(int p){
-        mn[p] = min(mn[LS], mn[RS]);
-        mx[p] = max(mx[LS], mx[RS]);
-    }
-    void Modify(int pos, int val, int p = 1, int gl = 1, int gr = N){
-        if(gl == gr)return mx[p] = mn[p] = val, void();
-        if(pos <= MID)Modify(pos, val, LS, gl, MID);
-        else Modify(pos, val, RS, MID + 1, gr);
-        Pushup(p);
-    }
-    int QueryGreaterThan(int val, int l, int r, int p = 1, int gl = 1, int gr = N){
-        if(gr < l || gl > r)return -1;
-        if(gl == gr)return mx[p] >= val ? gl : -1;
-        int ret(-1);
-        if(l <= MID && mx[LS] >= val)ret = QueryGreaterThan(val, l, r, LS, gl, MID);
-        if(!~ret && r >= MID + 1)ret = QueryGreaterThan(val, l, r, RS, MID + 1, gr);
-        return ret;
-    }
-    int QueryLessThan(int val, int l, int r, int p = 1, int gl = 1, int gr = N){
-        if(gr < l || gl > r)return -1;
-        if(gl == gr)return mn[p] <= val ? gl : -1;
-        int ret(-1);
-        if(r >= MID + 1 && mn[RS] <= val)ret = QueryLessThan(val, l, r, RS, MID + 1, gr);
-        if(!~ret && l <= MID)ret = QueryLessThan(val, l, r, LS, gl, MID);
-        return ret;
-    }
-}st;
-
 int main(){
-    int T = read();
-    while(T--){
-        ll res(0);
-        N = read();
-        st.Clear();
-        vector < int > A(N + 10, 0);
-        for(int i = 1; i <= N; ++i)st.Modify(i, A[i] = read());
-        auto Partition = [&](vector < int > &A, int l, int r)->int{
-            int pivot = A[(l + r) >> 1];
-            int i(l - 1), j(r + 1);
-            while(true){
-                i = st.QueryGreaterThan(pivot, i + 1, r);
-                j = st.QueryLessThan(pivot, l, j - 1);
-                i = !~i ? r + 1 : i;
-                j = !~j ? l - 1 : j;
-                // printf("next i = %d, j = %d\n", i, j);
-                if(i >= j)return j;
-                ++res;
-                st.Modify(i, A[j]);
-                st.Modify(j, A[i]);
-                swap(A[i], A[j]);
-            }
-        };
-        auto QuickSort = [&](auto&& self, vector < int > &A, int l, int r)->void{
-            if(l >= r)return;
-            int spl = Partition(A, l, r);
-            self(self, A, l, spl);
-            self(self, A, spl + 1, r);
-        }; QuickSort(QuickSort, A, 1, N);
-        printf("%lld\n", res);
+    vector < string > A;
+    int N = read();
+    int mxlen(0);
+    for(int i = 1; i <= N; ++i){
+        string S; cin >> S; A.emplace_back(S);
+        mxlen = max(mxlen, (int)S.length());
+    }
+    for(auto &s : A)s += string(mxlen - s.length(), '.');
+    sort(A.begin(), A.end());
+    for(const auto &s : A){
+        for(auto c : s)if(c != '.')printf("%c", c);
+        printf("\n");
     }
 
     // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
