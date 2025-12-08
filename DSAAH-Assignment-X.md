@@ -12,158 +12,289 @@
 
 Sol: 
 
+```
+8[0]
+```
 
+```
+   8[+1]
+  /
+ 2[0]
+```
+
+```
+     8[+2]
+    /
+  2[+1]
+ /
+1[0]
+```
+
+```
+   2[0]
+  /   \
+1[0]  8[0]
+```
+
+```
+     2[-1]
+    /     \
+ 1[0]    8[+1]
+        /
+      3[0]
+```
+
+```
+        2[-2]
+       /     \
+    1[0]    8[+2]
+           /
+         3[-1]
+           \
+           6[0]
+```
+
+```
+      2[-1]
+     /     \
+   1[0]   6[0]
+         /   \
+       3[0]  8[0]
+```
+
+```
+        2[-2]
+       /     \
+    1[0]    6[-1]
+           /    \
+         3[0]   8[-1]
+                  \
+                  10[0]
+```
+
+```
+        6[0]
+      /     \
+   2[0]     8[-1]
+  /   \        \
+1[0] 3[0]     10[0]
+```
+
+```
+        6[-1]
+      /      \
+   2[0]      8[-2]
+  /   \          \
+1[0] 3[0]       10[+1]
+                /
+              9[0]
+```
+
+```
+        6[0]
+      /     \
+   2[0]     9[0]
+  /   \    /   \
+1[0] 3[0] 8[0] 10[0]
+```
 
 ## Question 10.2 (0.5 marks)
 
 ![image-20251117105824016](./assets/image-20251117105824016.png)
 
+Sol:
 
+Let $N(h)$ represents the answer with height $h$, we obtain the balance factor $\le 1$, thus to minimize the height, we have $N(h) = N(h - 1) + N(h - 2) + 1, N(0) = 1, N(1) = 2$. Via calculation, we have $N(10) = 232$.
 
-## Question 8.5 (0.5 marks)
+## Question 10.3 (4 marks)
 
-![image-20251102214426366](./assets/image-20251102214426366.png)
+![image-20251118025553920](./assets/image-20251118025553920.png)
 
 Sol:
 
-![image-20251103210914155](./assets/image-20251103210914155.png)
+![image-20251118025608388](./assets/image-20251118025608388.png)
 
 ```cpp
+#define _USE_MATH_DEFINES
+#include <bits/stdc++.h>
+
+#define PI M_PI
+#define E M_E
+
+using namespace std;
+
+mt19937 rnd(random_device{}());
+int rndd(int l, int r){return rnd() % (r - l + 1) + l;}
+
+using ll = long long;
+using unll = unsigned long long;
+using uint = uint;
+using ld = long double;
+
+template < typename T = int >
+inline T read(void){
+    T ret(0);
+    short flag(1);
+    char c = getchar();
+    while(c != '-' && !isdigit(c))c = getchar();
+    if(c == '-')flag = -1, c = getchar();
+    while(isdigit(c)){
+        ret *= 10;
+        ret += int(c - '0');
+        c = getchar();
+    }
+    ret *= flag;
+    return ret;
+}
+
+class Node{
+public:
+    Node *ls, *rs;
+    int val, siz, cnt, h;
+};
+
+Node *root;
+
+#define siz(p) ((p) ? (p)->siz : 0)
+#define height(p) ((p) ? (p)->h : 0)
+
+class Tree{
+private:
+public:
+    void Pushup(Node *p){
+        if(!p)return;
+        p->siz = siz(p->ls) + siz(p->rs) + p->cnt;
+        p->h = max(height(p->ls), height(p->rs)) + 1;
+    }
+    int GetBalance(Node *p){
+        if(!p)return 0;
+        return height(p->ls) - height(p->rs);
+    }
+    Node* RotateRight(Node *y){
+        Node *x = y->ls;
+        Node *T2 = x->rs;
+        x->rs = y, y->ls = T2;
+        Pushup(y), Pushup(x);
+        return x;
+    }
+    Node* RotateLeft(Node *x){
+        Node *y = x->rs;
+        Node *T2 = y->ls;
+        y->ls = x, x->rs = T2;
+        Pushup(x), Pushup(y);
+        return y;
+    }
+    Node* QueryMx(Node *p = root){
+        if(!p)return p;
+        while(p->rs)p = p->rs;
+        return p;
+    }
+    Node* QueryMn(Node *p = root){
+        if(!p)return p;
+        while(p->ls)p = p->ls;
+        return p;
+    }
+    Node* Insert(int val, Node *p = root){
+        if(!p)return new Node{nullptr, nullptr, val, 1, 1, 1};
+        if(val < p->val)p->ls = Insert(val, p->ls);
+        else if(val > p->val)p->rs = Insert(val, p->rs);
+        else{
+            ++p->cnt;
+            Pushup(p);
+            return p;
+        }
+        Pushup(p);
+        int bf = GetBalance(p);
+        if(bf > 1 && val < p->ls->val)return RotateRight(p);
+        if(bf < -1 && val > p->rs->val)return RotateLeft(p);
+        if(bf > 1 && val > p->ls->val)p->ls = RotateLeft(p->ls), p = RotateRight(p);
+        else if(bf < -1 && val < p->rs->val)p->rs = RotateRight(p->rs), p = RotateLeft(p);
+        return p;
+    }
+    Node* Delete(int val, Node *p = root){
+        if(!p)return p;
+        if(val < p->val)p->ls = Delete(val, p->ls);
+        else if(val > p->val)p->rs = Delete(val, p->rs);
+        else{
+            if(p->cnt > 1)--p->cnt;
+            else if(!p->ls || !p->rs){
+                Node *tmp = p->ls ? p->ls : p->rs;
+                if(!tmp){
+                    delete p;
+                    return nullptr;
+                }else delete exchange(p, tmp);
+            }else{
+                Node *succ = QueryMn(p->rs);
+                p->val = succ->val, p->cnt = succ->cnt;
+                succ->cnt = 1;
+                p->rs = Delete(succ->val, p->rs);
+            }
+        }
+        if(!p)return p;
+        Pushup(p);
+        int bf = GetBalance(p);
+        if(bf > 1){
+            if(GetBalance(p->ls) >= 0)return RotateRight(p);
+            p->ls = RotateLeft(p->ls);
+            return RotateRight(p);
+        }
+        if(bf < -1){
+            if(GetBalance(p->rs) <= 0)return RotateLeft(p);
+            p->rs = RotateRight(p->rs);
+            return RotateLeft(p);
+        }
+        return p;
+    }
+    int QueryRnk(int val, Node *p = root){
+        if(!p)return 0;
+        if(val == p->val)return siz(p->ls);
+        if(val < p->val)return QueryRnk(val, p->ls);
+        return siz(p->ls) + p->cnt + QueryRnk(val, p->rs);
+    }
+    Node* QueryByRnk(int rnk, Node *p = root){
+        if(!p)return p;
+        if(rnk <= siz(p->ls))return QueryByRnk(rnk, p->ls);
+        if(rnk <= siz(p->ls) + p->cnt)return p;
+        return QueryByRnk(rnk - siz(p->ls) - p->cnt, p->rs);
+    }
+    Node* QuerySuc(int val, Node *p = root){
+        if(!p)return p;
+        if(val >= p->val)return QuerySuc(val, p->rs);
+        Node *res = QuerySuc(val, p->ls);
+        return res ? res : p;
+    }
+    Node* QueryPre(int val, Node *p = root){
+        if(!p)return p;
+        if(val <= p->val)return QueryPre(val, p->ls);
+        Node *res = QueryPre(val, p->rs);
+        return res ? res : p;
+    }
+    void DfsPre(Node *p, uint &idx, uint &ans){
+        if(!p)return;
+        ans += idx++ ^ (uint)abs(p->val);
+        DfsPre(p->ls, idx, ans);
+        DfsPre(p->rs, idx, ans);
+    }
+}tr;
+
 int main(){
     int T = read();
     while(T--){
-        int N = read();
-        stack < int > cur;
-        while(N--){
-            char c = getchar();
-            int val(0);
-            bool isd(false);
-            while(!isdigit(c) && c != '+' && c != '-' && c != '*')c = getchar();
-            while(isdigit(c))isd = true, val = (val * 10) + int(c - '0'), c = getchar();
-            if(isd)cur.push(val);
-            else{
-                int v1 = cur.top(); cur.pop();
-                int v2 = cur.top(); cur.pop();
-                cur.push(c == '+' ? (v1 + v2) : (c == '-' ? (v2 - v1) : v1 * v2));
-            }
-        }printf("%d\n", cur.top());
-    }
-
-    // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
-    return 0;
-}
-```
-
-## Question 8.6 (1 mark)
-
-![image-20251102214441561](./assets/image-20251102214441561.png)
-
-Sol:
-
-![image-20251103210908624](./assets/image-20251103210908624.png)
-
-```cpp
-struct Node{
-    int val;
-    int idx;
-    Node *left;
-    Node *right;
-};
-
-int main(){
-    int N = read();
-    vector < pair < int, int > > A(N + 10, {0, 0});
-    for(int i = 1; i <= N; ++i)A[i] = {read(), i};
-    sort(next(A.begin()), next(A.begin(), N + 1));
-
-    vector < Node* > nd(N + 10, nullptr);
-    vector < pair < int, int > > res(N + 10, {INT_MAX, -1});
-    vector < int > rnk(N + 10, 0);
-    for(int i = 1; i <= N; ++i){
-        rnk[A[i].second] = i;
-        nd[i] = new Node{
-            A[i].first,
-            A[i].second,
-            i == 1 ? nullptr : nd[i - 1],
-            nullptr
-        };
-        if(i != 1)nd[i - 1]->right = nd[i];
-    }
-    for(int i = N; i > 1; --i){
-        if(nd[rnk[i]]->right){
-            int cur = nd[rnk[i]]->right->val - A[rnk[i]].first;
-            if(cur < res[i].first)res[i] = {cur, nd[rnk[i]]->right->idx};
+        int opt = read(), val = read();
+        switch(opt){
+            case 1: root = tr.Insert(val); break;
+            case 2: root = tr.Delete(val); break;
+            case 3: printf("%d\n", tr.QueryRnk(val) + 1); break;
+            case 4: printf("%d\n", tr.QueryByRnk(val)->val); break;
+            case 5: printf("%d\n", tr.QueryPre(val)->val); break;
+            case 6: printf("%d\n", tr.QuerySuc(val)->val); break;
         }
-        if(nd[rnk[i]]->left){
-            int cur = A[rnk[i]].first - nd[rnk[i]]->left->val;
-            if(cur <= res[i].first)res[i] = {cur, nd[rnk[i]]->left->idx};
-        }
-        if(nd[rnk[i]]->left)nd[rnk[i]]->left->right = nd[rnk[i]]->right;
-        if(nd[rnk[i]]->right)nd[rnk[i]]->right->left = nd[rnk[i]]->left;
     }
-    for(int i = 2; i <= N; ++i)printf("%d %d\n", res[i].first, res[i].second);
-
-    // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
-    return 0;
-}
-
-```
-
-```cpp
-int main(){
-    int N = read(), M1 = read(), M2 = read();
-    vector < int > D1(N + 10, 0), D2(N + 10, 0);
-    vector < pair < int, int > > air1, air2;
-    for(int i = 1; i <= M1; ++i){
-        int s = read(), t = read();
-        air1.push_back({s, t});
-    }
-    for(int i = 1; i <= M2; ++i){
-        int s = read(), t = read();
-        air2.push_back({s, t});
-    }
-    sort(air1.begin(), air1.end(), [](const pair < int, int > &a, const pair < int, int > &b)->bool{
-        return a.first == b.first ? a.second < b.second : a.first < b.first;
-    });
-    sort(air2.begin(), air2.end(), [](const pair < int, int > &a, const pair < int, int > &b)->bool{
-        return a.first == b.first ? a.second < b.second : a.first < b.first;
-    });
-    auto cmp = [](const pair < int, int > &a, const pair < int, int > &b)->bool{
-        return a.first == b.first ? a.second > b.second : a.first > b.first;
-    };
-    priority_queue < pair < int, int >, vector < pair < int, int > >, decltype(cmp) > cur(cmp);
-    priority_queue < int, vector < int >, greater < int > > fre;
-    int lft(0);
-    for(auto [s, t] : air1){
-        while(!cur.empty() && cur.top().first < s)
-            fre.push(cur.top().second), cur.pop();
-        int idx(-1);
-        if(!fre.empty())idx = fre.top(), fre.pop();
-        else idx = ++lft;
-        if(idx <= N)++D1[idx];
-        cur.push({t, idx});
-    }
-    while(!cur.empty())cur.pop();
-    while(!fre.empty())fre.pop();
-    lft = 0;
-    for(auto [s, t] : air2){
-        while(!cur.empty() && cur.top().first < s)
-            fre.push(cur.top().second), cur.pop();
-        int idx(-1);
-        if(!fre.empty())idx = fre.top(), fre.pop();
-        else idx = ++lft;
-        if(idx <= N)++D2[idx];
-        cur.push({t, idx});
-    }
-
-    int res(0);
-    for(int i = 1; i <= N; ++i)D1[i] += D1[i - 1], D2[i] += D2[i - 1];
-    for(int i = 0; i <= N; ++i)res = max(res, D1[i] + D2[N - i]);
-    printf("%d\n", res);
-    
+    uint idx = 1, ans = 0;
+    tr.DfsPre(root, idx, ans);
+    printf("%u\n", ans);
 
     // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
     return 0;
 }
 ```
-
