@@ -10,219 +10,220 @@
 
 ![image-20251208110952452](./assets/image-20251208110952452.png)
 
+Sol:
 
+1. With an adjacency list representation, to compute the in-degree of a vertex $v$ we must scan all adjacency lists and count how many times $v$ appears as a neighbor. The total length of all lists is $|E|$, so the running time is $\Theta(|V| + |E|)$.
+
+---
+
+2. With an adjacency list representation, to compute the in-degrees of all vertices we initialise an array $\text{indeg}[v]=0$ for all $v\in V$, then scan every adjacency list once and for each edge $(u,w)$ increment $\text{indeg}[w]$. This takes $\Theta(|V| + |E|)$ time.
+
+---
+
+3. With an adjacency matrix representation, the in-degree of a vertex $v$ is the number of ones in column $v$. We must scan all $|V|$ entries of that column, so the running time is $\Theta(|V|)$.
+
+---
+
+4. With an adjacency matrix representation, to compute the in-degrees of all vertices we need to examine all $|V|^2$ entries in the matrix (for example by scanning each column). The running time is $\Theta(|V|^2)$.
 
 ## Question 13.2 (0.5 marks)
 
 ![image-20251208111047618](./assets/image-20251208111047618.png)
 
-PF:
+Sol:
 
-Sort items by value density $$\rho_i = v_i / w_i$$ so that $$\rho_1 \ge \rho_2 \ge \dots \ge \rho_n.$$
+1. The problem is the minimum vertex cover problem on an undirected graph. 
+   
+   The mayor’s rule “while there is an unmonitored edge, put cameras on both endpoints” does **not** always give an optimal solution. 
 
-Greedy choice for the first item: For any optimal solution., if it already uses item 1 as much as possible, it satisfy.
+   Example: on the path $1-2-3-4$, an optimal solution is $\{2,3\}$ (2 cameras). The mayor could first choose edge $(1,2)$, placing cameras on $1$ and $2$, and then choose edge $(3,4)$, placing cameras on $3$ and $4$, for a total of 4 cameras.
+   
+   Let $M$ be the set of edges chosen by the mayor. No two edges in $M$ share a vertex, because once a vertex gets a camera none of its incident edges will ever be chosen again, so $M$ is a matching. Any vertex cover $C^*$ must contain at least one endpoint of each edge in $M$, so $|C^*|\ge |M|$. The mayor’s camera set $C$ contains both endpoints of each edge in $M$, hence $|C| = 2|M| \le 2|C^*|$. Therefore the strategy is a $2$-approximation: it never uses more than twice as many cameras as an optimal solution, and this factor $2$ is tight.
+   
+   Therefore, the solution comes close and is nice.
 
-Otherwise, it uses some weight of other items $$j$$ with $$\rho_j \le \rho_1$$ and less than the maximum possible weight of item 1. 
+---
 
-Move a small weight $$\delta$$ from such an item $$j$$ to item 1, the value change is $$\delta(\rho_1 - \rho_j) \ge 0,$$ so the solution won't be worse.
+2. A natural greedy strategy is to always place the next camera on the vertex that currently has the largest number of unmonitored incident edges. Concretely, maintain the set $C$ of vertices with cameras and the set $U$ of unmonitored edges. Initially $C = \varnothing$ and $U = E$. While $U$ is nonempty, for each vertex $v$ compute its current unmonitored degree $d_U(v)$, choose a vertex $v^*$ with maximum $d_U(v)$, put a camera on $v^*$, and delete from $U$ all edges incident to $v^*$. When $U$ becomes empty, return $C$ as the set of camera locations. Nevertheless, this greedy solution might be worse.
 
-Repeating, we obtain an optimal solution that uses item 1 as much as capacity allows. Hence the greedy first choice is part of some optimal solution.
 
-After fixing item 1 greedily, the remaining capacity and remaining items form a smaller fractional-knapsack instance.  
+## Question 13.3 (0.25 marks)
 
-By the same argument, taking as much as possible of the next highest-density item is part of some optimal solution of the subproblem, and so on.
-
-By induction, repeatedly taking as much as possible of the remaining item with largest value density yields an optimal solution.  
-
-Therefore the fractional knapsack problem has the greedy-choice property, and the greedy algorithm is optimal.
-
-## Question 12.3 (0.5 marks)
-
-![image-20251201190125701](./assets/image-20251201190125701.png)
+![image-20251208151130780](./assets/image-20251208151130780.png)
 
 Sol:
 
-1. From the current station, always ride to the farthest station that is within distance $\ell$, stop there and repeat until reaching $s_n$.
+The BFS tree with source vertex $3$ gives the following distance $d$ and predecessor $\pi$ values:
 
-We can implement this by scanning the stations once from left to right, so the running time is $O(n)$.
+- Vertex $1$: $d[1] = \infty$, $\pi[1] = \text{NIL}$.
+- Vertex $2$: $d[2] = 3$, $\pi[2] = 4$.
+- Vertex $3$: $d[3] = 0$, $\pi[3] = \text{NIL}$.
+- Vertex $4$: $d[4] = 2$, $\pi[4] = 5$.
+- Vertex $5$: $d[5] = 1$, $\pi[5] = 3$.
+- Vertex $6$: $d[6] = 1$, $\pi[6] = 3$.
 
-2. Let the greedy algorithm choose $g_1$ as its first stop, i.e. the farthest station reachable from $s_1$ within distance $\ell$.
+## Question 13.4 (0.25 marks)
 
-Take any optimal solution and let its first stop be $o_1$. Since $o_1$ is reachable from $s_1$ within $\ell$, and $g_1$ is the farthest such station, $g_1$ lies at least as far along the route as $o_1$.
-
-Replace $o_1$ by $g_1$ in this optimal solution and keep all later stops unchanged.  The new schedule is still feasible and uses no more stops.
-
-Hence there exists an optimal solution whose first stop is exactly the greedy choice $g_1$.
-
-After stopping at $g_1$, the remaining problem (from $g_1$ to $s_n$) has the same structure. 
-
-Repeating the same argument inductively shows that every greedy choice can be aligned with some optimal solution, so the greedy algorithm produces a schedule with the minimal possible number of stops.
-
-## Question 12.4 (0.75 marks)
-
-![image-20251201191131528](./assets/image-20251201191131528.png)
+![image-20251208151150868](./assets/image-20251208151150868.png)
 
 Sol:
 
-![image-20251202020622032](./assets/image-20251202020622032.png)
+If BFS uses only one bit of colour (0 = white, 1 = gray) and the last line that sets a vertex to black is removed, the algorithm still produces the correct BFS tree and distances.
+
+The only colour test in BFS is if v.colour == WHITE then enqueue v. Once a vertex has been discovered, its colour becomes nonwhite and is never changed back to white, so it will never be enqueued again. Thus each vertex is discovered and enqueued at most once, and the queue order is unchanged.
+
+What we lose is only the distinction between vertices that are currently in the queue and vertices that have been fully processed. 
+
+## Question 13.5 (0.25 marks)
+
+![image-20251208151207612](./assets/image-20251208151207612.png)
+
+Sol:
+
+When BFS is implemented with an adjacency matrix, its running time is $\Theta(|V|^2)$.
+
+Reason: For each vertex $u$ that is dequeued, BFS must scan the entire row of the matrix to find all neighbours of $u$. This takes $\Theta(|V|)$ time per vertex. Since there are $|V|$ vertices and each is processed once, the total time spent scanning adjacency information is $\Theta(|V| \cdot |V|) = \Theta(|V|^2)$. The initialization cost is dominated by $|V|^2$, so the overall running time is $\Theta(|V|^2)$.
+
+## Question 13.6 (1 mark)
+
+![image-20251208151243310](./assets/image-20251208151243310.png)
+
+Sol:
+
+![image-20251208173742775](./assets/image-20251208173742775.png)
 
 ```cpp
-int main(){
-    int N = read();
-    ll S = read < ll >();
-    vector < ll > W(N);
-    for(int i = 0; i < N; ++i)W[i] = read < ll >();
-
-    if(S == 1){printf("%d\n", N >= 1 ? 1 : 0); return 0;}
-
-    if(S >= 2 && N <= 2){printf("%d\n", N); return 0;}
-
-    sort(W.begin(), W.end());
-
-    ll num(0), cnt1(0), cnt2(0);
-    int used(0);
-
-    for(int i = 0; i < N - 2; ++i){
-        ll len = W[i];
-        ll x = len / 3;
-        int r = len % 3;
-        if(r == 1)++cnt1;
-        if(r == 2)++cnt2;
-        ll pairCnt = cnt1 < cnt2 ? cnt1 : cnt2;
-        x += pairCnt;
-        cnt1 -= pairCnt;
-        cnt2 -= pairCnt;
-        ll need = num + x + (cnt1 + 1) / 2 + cnt2;
-        if(need > S - 2)break;
-        num += x;
-        ++used;
-    }
-
-    int ans = used + 2;
-    if(ans > N)ans = N;
-    printf("%d\n", ans);
-
-    // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
-    return 0;
-}
-```
-
-```cpp
-int main(){
-    int T = read();
-
-    while(T--){
-        int N = read();
-        ll K = read < ll >();
-
-        vector < int > C(N + 1), W(N + 1), F(N + 1);
-        int mxFloor(0);
-        for(int i = 1; i <= N; ++i){
-            C[i] = read(), W[i] = read(), F[i] = read();
-            mxFloor = max(mxFloor, F[i]);
-        }
-
-        vector < ll > cnt1(mxFloor + 1, 0), cnt2(mxFloor + 1, 0);
-        for(int i = 1; i <= N; ++i){
-            if(W[i] == 1)cnt1[F[i]] += (ll)C[i];
-            else cnt2[F[i]] += (ll)C[i];
-        }
-
-        auto CalcRides = [&](ll X, ll Y)->ll{
-            if(X == 0 && Y == 0)return 0;
-            ll halfK = K >> 1, pairs = X >> 1;
-            ll A = Y + pairs;
-            if(A == 0)return (X & 1) ? 1 : 0;
-            ll bins = (A + halfK - 1) / halfK;
-            if((X & 1) && A % halfK == 0)++bins;
-            return bins;
-        };
-
-        ll tot1(0), tot2(0);
-        ll ans(0);
-
-        for(int f = mxFloor; f >= 1; --f){
-            tot1 += cnt1[f], tot2 += cnt2[f];
-            ll rides = CalcRides(tot1, tot2);
-            ans += rides;
-        }
-
-        printf("%lld\n", ans);
-    }
-
-    // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
-    return 0;
-}
-
-```
-
-```cpp
-struct Person{
-    ll l, r;
-    int id;
+struct Edge{
+    Edge* nxt;
+    int to;
 };
 
 int main(){
-    int T = read();
-    while(T--){
-        int N = read();
-        ll F = read();
-
-        vector < Person > P(N);
-        for(int i = 0; i < N; ++i){
-            ll L = read();
-            ll R = read();
-            P[i].l = L, P[i].r = R;
-            P[i].id = i + 1;
-        }
-
-        vector < char > used(N + 10, 0);
-
-        sort(P.begin(), P.end(), [](const Person &a, const Person &b)->bool{
-            if(a.l == b.l)return a.r > b.r;
-            return a.l < b.l;
-        });
-
-        ll now(F), ans(0);
-        vector < int > order;
-
-        for(int i = 0; i < N; ++i){
-            ll L = P[i].l, R = P[i].r;
-            if(L <= now){
-                if(R > now){
-                    ans += (R - L);
-                    now = R;
-                    used[P[i].id] = 1;
-                    order.push_back(P[i].id);
-                }
-            }else{
-                ans += (L - now);
-                ans += (R - L);
-                now = R;
-                used[P[i].id] = 1;
-                order.push_back(P[i].id);
-            }
-        }
-
-        sort(P.begin(), P.end(), [](const Person &a, const Person &b)->bool{
-            return a.r > b.r;
-        });
-
-        for(int i = 0; i < N; ++i){
-            if(used[P[i].id])continue;
-            ll L = P[i].l;
-            ll R = P[i].r;
-            ans += (R - L);
-            order.push_back(P[i].id);
-        }
-
-        printf("%lld\n", ans);
-        for(int i = 0; i < N; ++i)
-            printf("%d%c", order[i], i + 1 == N ? '\n' : ' ');
+    int N = read(), M = read();
+    vector < Edge* > head(N + 1, nullptr), rhead(N + 1, nullptr);
+    for(int i = 1; i <= M; ++i){
+        int x = read(), y = read();
+        head[x] = new Edge{head[x], y};
+        rhead[y] = new Edge{rhead[y], x};
     }
 
+    int s = read(), t = read();
+    
+    vector < int > vis(N + 1, 0);
+    queue < int > q;
+
+    vis[t] = 1;
+    q.push(t);
+    while(!q.empty()){
+        int u = q.front(); q.pop();
+        for(auto i = rhead[u]; i; i = i->nxt){
+            if(!vis[i->to])vis[i->to] = 1, q.push(i->to);
+        }
+    }
+    
+    if(!vis[s]){printf("-1\n"); return 0;}
+    
+    vector < int > good(N + 1, 1);
+    for(int p = 1; p <= N; ++p){
+        for(auto i = head[p]; i; i = i->nxt){
+            if(!vis[i->to]){good[p] = 0; break;}
+        }
+    }
+    
+    vector < int > ok(N + 1, 0);
+    for(int p = 1; p <= N; ++p)
+        if(good[p] && vis[p])ok[p] = 1;
+    
+    if(!ok[s] || !ok[t]){printf("-1\n"); return 0;}
+    
+    vector < int > dis(N + 1, -1);
+    while(!q.empty())q.pop();
+    dis[s] = 0;
+    q.push(s);
+    while(!q.empty()){
+        int p = q.front(); q.pop();
+        if(p == t)break;
+        for(auto i = head[p]; i; i = i->nxt){
+            if(!ok[i->to])continue;
+            if(dis[i->to] != -1)continue;
+            dis[i->to] = dis[p] + 1;
+            q.push(i->to);
+        }
+    }
+    
+    printf("%d\n", dis[t]);
+    // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
+    return 0;
+}
+```
+
+```cpp
+struct Edge{
+    Edge* nxt;
+    int to;
+};
+
+int main(){
+    int N = read(), M = read();
+    
+    vector < Edge* > head(N + 1, nullptr);
+    
+    for(int k = 1; k <= M; ++k){
+        int x = read(), y = read();
+        head[x] = new Edge{head[x], y};
+        head[y] = new Edge{head[y], x};
+    }
+    
+    vector < int > dis1(N + 1, -1);
+    queue < int > q;
+    dis1[1] = 0;
+    q.push(1);
+    
+    int farNode(1), farDist(0), cnt(0);
+    
+    while(!q.empty()){
+        int p = q.front(); q.pop();
+        ++cnt;
+        if(dis1[p] > farDist)farDist = dis1[p], farNode = p;
+        for(auto i = head[p]; i; i = i->nxt){
+            int v = i->to;
+            if(dis1[v] != -1)continue;
+            dis1[v] = dis1[p] + 1;
+            q.push(v);
+        }
+    }
+    
+    if(cnt < N){printf("-1\n"); return 0;}
+    
+    
+    vector < int > dis2(N + 1, -1);
+    queue < int > q2;
+    dis2[farNode] = 0;
+    q2.push(farNode);
+    
+    int dPrime(0);
+    
+    while(!q2.empty()){
+        int p = q2.front(); q2.pop();
+        if(dis2[p] > dPrime)dPrime = dis2[p];
+        for(auto i = head[p]; i; i = i->nxt){
+            int v = i->to;
+            if(dis2[v] != -1)continue;
+            dis2[v] = dis2[p] + 1;
+            q2.push(v);
+        }
+    }
+    
+    int k(0), len(1);
+    while(len < dPrime)len <<= 1, ++k;
+    
+    printf("%d\n", k + 1);
+    
+    // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
     return 0;
 }
 
 ```
+
+
 
