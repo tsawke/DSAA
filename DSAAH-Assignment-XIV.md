@@ -4,157 +4,223 @@
 
 **Student ID**: 12413104
 
-**Date**: 2025.12.11
+**Date**: 2025.12.16
 
-## Question 13.1 (0.5 marks)
+## Question 14.1 (0.25 marks)
 
-![image-20251208110952452](./assets/image-20251208110952452.png)
+![image-20251215170445554](./assets/image-20251215170445554.png)
 
 Sol:
-
-1. With an adjacency list representation, to compute the in-degree of a vertex $v$ we must scan all adjacency lists and count how many times $v$ appears as a neighbor. The total length of all lists is $|E|$, so the running time is $\Theta(|V| + |E|)$.
-
+1. The traversal $a \to b \to c$ (finish $c$) $\to d$ (finish $d$) (finish $b$) (finish $a$), then $e$ (finish $e$).
 ---
+2. The timestamps and parents are: $a:(d=1,f=8,\pi=\text{NIL})$, $b:(d=2,f=7,\pi=a)$, $c:(d=3,f=4,\pi=b)$, $d:(d=5,f=6,\pi=b)$, $e:(d=9,f=10,\pi=\text{NIL})$.
 
-2. With an adjacency list representation, to compute the in-degrees of all vertices we initialise an array $\text{indeg}[v]=0$ for all $v\in V$, then scan every adjacency list once and for each edge $(u,w)$ increment $\text{indeg}[w]$. This takes $\Theta(|V| + |E|)$ time.
+## Question 14.2 (0.5 marks)
 
----
+![image-20251215171902117](./assets/image-20251215171902117.png)
 
-3. With an adjacency matrix representation, the in-degree of a vertex $v$ is the number of ones in column $v$. We must scan all $|V|$ entries of that column, so the running time is $\Theta(|V|)$.
+PF:
+The claim is **false**.
 
----
+Counterexample: Consider the directed graph with $V=\{1,2,3\}$ and $E=\{(1,2),(2,3),(3,1),(3,2)\}$. An edge $(u,v)$ is a back edge iff $v$ is an ancestor of $u$ in the DFS tree.
 
-4. With an adjacency matrix representation, to compute the in-degrees of all vertices we need to examine all $|V|^2$ entries in the matrix (for example by scanning each column). The running time is $\Theta(|V|^2)$.
+Run DFS with vertex order $1,2,3$. The DFS tree can be $1\to 2\to 3$, and from $3$ both edges $(3,1)$ and $(3,2)$ go to gray ancestors, so there are $2$ back edges.
 
-## Question 13.2 (0.5 marks)
+Then run DFS with vertex order $3,1,2$ (start at $3$). One possible DFS tree is $3\to 1\to 2$, so $(2,3)$ is a back edge, and when $(3,2)$ is examined, $2$ is already black, so it is not a back edge.
 
-![image-20251208111047618](./assets/image-20251208111047618.png)
+Hence one DFS has exactly $1$ back edge while another has $2$, refuting the claim.
+$\texttt{Q.E.D.}$
+
+
+## Question 14.3 (0.25 marks)
+
+![image-20251215171933736](./assets/image-20251215171933736.png)
+
+Sol:
+Using Topological-Sort, the finish times are $f[k]=24,f[e]=22,f[g]=21,f[i]=20,f[l]=19,f[f]=15,f[h]=14,f[j]=13,f[b]=8,f[a]=6,f[c]=5,f[d]=4$.
+Hence the topological ordering is $$k,\ e,\ g,\ i,\ l,\ f,\ h,\ j,\ b,\ a,\ c,\ d.$$
+
+## Question 14.4 (0.5 marks)
+
+![image-20251215172229244](./assets/image-20251215172229244.png)
+
+Sol:
+Run DFS on the undirected graph while storing $parent[u]$.
+
+In DFS-Visit$(u,p)$, mark $u$ visited and scan each neighbor $v\in Adj[u]$: if $v$ is unvisited, set $parent[v]=u$ and recurse; otherwise, if $v\ne p$, report “cyclic”. If all DFS trees finish without triggering $v\ne p$, report “acyclic”.
+The DFS work is $O(|V|+|E|)$, and for an undirected acyclic graph (a forest) we have $|E|\le |V|-1$, so the full check runs in $O(|V|)$.
+
+![image-20251216103431388](./assets/image-20251216103431388.png)
+
+## Question 14.5 (1 mark)
+
+![image-20251215174556625](./assets/image-20251215174556625.png)
 
 Sol:
 
-1. The problem is the minimum vertex cover problem on an undirected graph. 
-   
-   The mayor’s rule “while there is an unmonitored edge, put cameras on both endpoints” does **not** always give an optimal solution. 
-
-   Example: on the path $1-2-3-4$, an optimal solution is $\{2,3\}$ (2 cameras). The mayor could first choose edge $(1,2)$, placing cameras on $1$ and $2$, and then choose edge $(3,4)$, placing cameras on $3$ and $4$, for a total of 4 cameras.
-   
-   Let $M$ be the set of edges chosen by the mayor. No two edges in $M$ share a vertex, because once a vertex gets a camera none of its incident edges will ever be chosen again, so $M$ is a matching. Any vertex cover $C^*$ must contain at least one endpoint of each edge in $M$, so $|C^*|\ge |M|$. The mayor’s camera set $C$ contains both endpoints of each edge in $M$, hence $|C| = 2|M| \le 2|C^*|$. Therefore the strategy is a $2$-approximation: it never uses more than twice as many cameras as an optimal solution, and this factor $2$ is tight.
-   
-   Therefore, the solution comes close and is nice.
-
----
-
-2. A natural greedy strategy is to always place the next camera on the vertex that currently has the largest number of unmonitored incident edges. Concretely, maintain the set $C$ of vertices with cameras and the set $U$ of unmonitored edges. Initially $C = \varnothing$ and $U = E$. While $U$ is nonempty, for each vertex $v$ compute its current unmonitored degree $d_U(v)$, choose a vertex $v^*$ with maximum $d_U(v)$, put a camera on $v^*$, and delete from $U$ all edges incident to $v^*$. When $U$ becomes empty, return $C$ as the set of camera locations. Nevertheless, this greedy solution might be worse.
-
-
-## Question 13.3 (0.25 marks)
-
-![image-20251208151130780](./assets/image-20251208151130780.png)
-
-Sol:
-
-The BFS tree with source vertex $3$ gives the following distance $d$ and predecessor $\pi$ values:
-
-- Vertex $1$: $d[1] = \infty$, $\pi[1] = \text{NIL}$.
-- Vertex $2$: $d[2] = 3$, $\pi[2] = 4$.
-- Vertex $3$: $d[3] = 0$, $\pi[3] = \text{NIL}$.
-- Vertex $4$: $d[4] = 2$, $\pi[4] = 5$.
-- Vertex $5$: $d[5] = 1$, $\pi[5] = 3$.
-- Vertex $6$: $d[6] = 1$, $\pi[6] = 3$.
-
-## Question 13.4 (0.25 marks)
-
-![image-20251208151150868](./assets/image-20251208151150868.png)
-
-Sol:
-
-If BFS uses only one bit of colour (0 = white, 1 = gray) and the last line that sets a vertex to black is removed, the algorithm still produces the correct BFS tree and distances.
-
-The only colour test in BFS is if v.colour == WHITE then enqueue v. Once a vertex has been discovered, its colour becomes nonwhite and is never changed back to white, so it will never be enqueued again. Thus each vertex is discovered and enqueued at most once, and the queue order is unchanged.
-
-What we lose is only the distinction between vertices that are currently in the queue and vertices that have been fully processed. 
-
-## Question 13.5 (0.25 marks)
-
-![image-20251208151207612](./assets/image-20251208151207612.png)
-
-Sol:
-
-When BFS is implemented with an adjacency matrix, its running time is $\Theta(|V|^2)$.
-
-Reason: For each vertex $u$ that is dequeued, BFS must scan the entire row of the matrix to find all neighbours of $u$. This takes $\Theta(|V|)$ time per vertex. Since there are $|V|$ vertices and each is processed once, the total time spent scanning adjacency information is $\Theta(|V| \cdot |V|) = \Theta(|V|^2)$. The initialization cost is dominated by $|V|^2$, so the overall running time is $\Theta(|V|^2)$.
-
-## Question 13.6 (1 mark)
-
-![image-20251208151243310](./assets/image-20251208151243310.png)
-
-Sol:
-
-![image-20251208173742775](./assets/image-20251208173742775.png)
+![image-20251216094140236](./assets/image-20251216094140236.png)
 
 ```cpp
-struct Edge{
-    Edge* nxt;
-    int to;
+struct Fraction{//non-negative
+    __int128_t a, b;
+    Fraction Shrink(void){
+        __int128_t div = __gcd(a, b);
+        a /= div, b /= div;
+        return *this;
+    }
+    friend const Fraction operator + (const Fraction &x, const Fraction &y){
+        __int128_t below = x.b * y.b / __gcd(x.b, y.b);
+        return Fraction{below / x.b * x.a + below / y.b * y.a, below}.Shrink();
+    }
+    friend const Fraction operator / (const Fraction &x, const int &v){
+        return Fraction{x.a, x.b * v}.Shrink();
+    }
+    friend const Fraction operator / (const Fraction &x, const Fraction &y){
+        return Fraction{x.a * y.b, x.b * y.a}.Shrink();
+    }
+    friend const Fraction operator * (const Fraction &x, const Fraction &y){
+        return Fraction{x.a * y.a, x.b * y.b}.Shrink();
+    }
+    friend const bool operator <= (const Fraction &x, const Fraction &y){
+        return x.a * y.b <= y.a * x.b;
+    }
+    friend const bool operator >= (const Fraction &x, const Fraction &y){
+        return x.a * y.b > y.a * x.b;
+    }
+    friend const bool operator < (const Fraction &x, const Fraction &y){
+        return x.a * y.b < y.a * x.b;
+    }
+    friend const bool operator > (const Fraction &x, const Fraction &y){
+        return x.a * y.b > y.a * x.b;
+    }
+    void Desc(void){
+        this->Shrink();
+        printf("%lld/%lld\n", (ll)this->a, (ll)this->b);
+    }
 };
+
+
+void print(__int128_t x) {
+    if(x > 9)print(x / 10);
+    putchar(x % 10 + '0');
+}
 
 int main(){
     int N = read(), M = read();
-    vector < Edge* > head(N + 1, nullptr), rhead(N + 1, nullptr);
+    vector < vector<int> > adj(N + 10);
+    vector < int > d(N + 10, 0);
+    vector < int > inDeg(N + 10, 0);
+    vector < Fraction > water(N + 10, {0, 1});
+    
+    for(int i = 1; i <= N; ++i){
+        d[i] = read();
+        if(d[i] == 0)continue;
+        for(int j = 1; j <= d[i]; ++j){
+            int to = read();
+            adj[i].push_back(to);
+            ++inDeg[to];
+        }
+    }
+    
+    queue < int > Q;
     for(int i = 1; i <= M; ++i){
-        int x = read(), y = read();
-        head[x] = new Edge{head[x], y};
-        rhead[y] = new Edge{rhead[y], x};
+        water[i] = {1, 1};
+        if(inDeg[i] == 0)Q.push(i);
+    }
+    while(!Q.empty()){
+        int u = Q.front();
+        Q.pop();
+        if(d[u] == 0)continue;
+        Fraction flowOut = water[u] / d[u];
+        for(int v : adj[u]){
+            water[v] = water[v] + flowOut;
+            --inDeg[v];
+            if(inDeg[v] == 0)Q.push(v);
+        }
+    }
+    for(int i = 1; i <= N; ++i){
+        if(d[i] == 0){
+            if(water[i].a == 0)printf("0 1\n");
+            else {
+                print(water[i].a); putchar(' ');
+                print(water[i].b); putchar('\n');
+            }
+        }
+    }
+    return 0;
+}
+
+```
+
+```cpp
+int main(){
+    int N = read(), M = read();
+
+    vector < bitset < 260 > > adj(N + 10), rev(N + 10);
+
+    for(int i = 0; i < N; ++i){
+        char c = getchar();
+        while(!isdigit(c))c = getchar();
+        if(c - '0')adj[i][0] = 1, rev[0][i] = 1;
+        for(int j = 1; j < N; ++j){
+            c = getchar();
+            if(c - '0')adj[i][j] = 1, rev[j][i] = 1;
+        }
     }
 
-    int s = read(), t = read();
-    
-    vector < int > vis(N + 1, 0);
-    queue < int > q;
+    bitset < 260 > vis;
+    vector < int > ord;
+    int cnt(0);
 
-    vis[t] = 1;
-    q.push(t);
-    while(!q.empty()){
-        int u = q.front(); q.pop();
-        for(auto i = rhead[u]; i; i = i->nxt){
-            if(!vis[i->to])vis[i->to] = 1, q.push(i->to);
+    auto dfs1 = [&](auto &&self, int p)->void{
+        vis[p] = 1;
+        while(true){
+            int q = (adj[p] & ~vis)._Find_first();
+            if(q >= N)break;
+            self(self, q);
         }
-    }
-    
-    if(!vis[s]){printf("-1\n"); return 0;}
-    
-    vector < int > good(N + 1, 1);
-    for(int p = 1; p <= N; ++p){
-        for(auto i = head[p]; i; i = i->nxt){
-            if(!vis[i->to]){good[p] = 0; break;}
+        ord.push_back(p);
+    };
+
+    auto dfs2 = [&](auto &&self, int p)->void{
+        vis[p] = 1;
+        ++cnt;
+        while(true){
+            int q = (rev[p] & ~vis)._Find_first();
+            if(q >= N)break;
+            self(self, q);
         }
-    }
-    
-    vector < int > ok(N + 1, 0);
-    for(int p = 1; p <= N; ++p)
-        if(good[p] && vis[p])ok[p] = 1;
-    
-    if(!ok[s] || !ok[t]){printf("-1\n"); return 0;}
-    
-    vector < int > dis(N + 1, -1);
-    while(!q.empty())q.pop();
-    dis[s] = 0;
-    q.push(s);
-    while(!q.empty()){
-        int p = q.front(); q.pop();
-        if(p == t)break;
-        for(auto i = head[p]; i; i = i->nxt){
-            if(!ok[i->to])continue;
-            if(dis[i->to] != -1)continue;
-            dis[i->to] = dis[p] + 1;
-            q.push(i->to);
+    };
+
+    for(int i = 1; i <= M; ++i){
+        int K = read();
+        while(K--){
+            int p(read() - 1), q(read() - 1);
+            adj[p].flip(q), rev[q].flip(p);
         }
+
+        vis.reset();
+        ord.clear();
+        for(int p = 0; p < N; ++p)
+            if(!vis[p])dfs1(dfs1, p);
+
+        vis.reset();
+        ll ans(0);
+        for(int j = N - 1; j >= 0; --j){
+            int p(ord[j]);
+            if(!vis[p]){
+                cnt = 0;
+                dfs2(dfs2, p);
+                ans += (1ll * cnt * (cnt - 1)) >> 1;
+            }
+        }
+        printf("%lld\n", ans);
     }
-    
-    printf("%d\n", dis[t]);
+
     // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
     return 0;
 }
+
 ```
 
 ```cpp
@@ -164,62 +230,118 @@ struct Edge{
 };
 
 int main(){
-    int N = read(), M = read();
-    
-    vector < Edge* > head(N + 1, nullptr);
-    
-    for(int k = 1; k <= M; ++k){
-        int x = read(), y = read();
-        head[x] = new Edge{head[x], y};
-        head[y] = new Edge{head[y], x};
+    int N(0), M(0);
+
+    bool bol(true);
+    int ch(0);
+    while((ch = getchar()) != EOF){
+        if(bol && ch == 'c'){
+            while(ch != '\n' && ch != EOF)ch = getchar();
+            bol = true;
+            continue;
+        }
+        if(bol && ch == 'p')break;
+        bol = (ch == '\n');
     }
-    
-    vector < int > dis1(N + 1, -1);
-    queue < int > q;
-    dis1[1] = 0;
-    q.push(1);
-    
-    int farNode(1), farDist(0), cnt(0);
-    
-    while(!q.empty()){
-        int p = q.front(); q.pop();
-        ++cnt;
-        if(dis1[p] > farDist)farDist = dis1[p], farNode = p;
-        for(auto i = head[p]; i; i = i->nxt){
-            int v = i->to;
-            if(dis1[v] != -1)continue;
-            dis1[v] = dis1[p] + 1;
-            q.push(v);
+
+    N = read(), M = read();
+    int V(N << 1);
+
+    vector < Edge* > head(V + 10, nullptr), rHead(V + 10, nullptr);
+    vector < Edge > ed((M << 1) + 10), red((M << 1) + 10);
+    int ec(0), rc(0);
+
+    auto Id = [&](int lit)->int{
+        int p((abs(lit) - 1) << 1);
+        if(lit < 0)p ^= 1;
+        return p;
+    };
+
+    auto AddEdge = [&](int s, int t)->void{
+        ed[ec] = Edge{head[s], t}, head[s] = &ed[ec++];
+        red[rc] = Edge{rHead[t], s}, rHead[t] = &red[rc++];
+    };
+
+    auto AddClause = [&](int a, int b)->void{
+        int p(Id(a)), q(Id(b));
+        AddEdge(p ^ 1, q), AddEdge(q ^ 1, p);
+    };
+
+    for(int i = 1; i <= M; ++i){
+        int a = read(), b = read();
+        int z = read();
+        while(z != 0)z = read();
+        AddClause(a, b);
+    }
+
+    vector < char > vis(V + 10, 0);
+    vector < Edge* > it(V + 10, nullptr);
+    vector < int > ord, stk;
+
+    for(int p = 0; p < V; ++p){
+        if(vis[p])continue;
+
+        stk.clear();
+        stk.push_back(p);
+        vis[p] = 1, it[p] = head[p];
+
+        while((int)stk.size()){
+            int u(stk.back());
+            auto &e = it[u];
+
+            while(e && vis[e->to])e = e->nxt;
+
+            if(!e){
+                ord.push_back(u);
+                stk.pop_back();
+            }else{
+                int v(e->to);
+                e = e->nxt;
+                if(!vis[v])vis[v] = 1, it[v] = head[v], stk.push_back(v);
+            }
         }
     }
-    
-    if(cnt < N){printf("-1\n"); return 0;}
-    
-    
-    vector < int > dis2(N + 1, -1);
-    queue < int > q2;
-    dis2[farNode] = 0;
-    q2.push(farNode);
-    
-    int dPrime(0);
-    
-    while(!q2.empty()){
-        int p = q2.front(); q2.pop();
-        if(dis2[p] > dPrime)dPrime = dis2[p];
-        for(auto i = head[p]; i; i = i->nxt){
-            int v = i->to;
-            if(dis2[v] != -1)continue;
-            dis2[v] = dis2[p] + 1;
-            q2.push(v);
+
+    for(int p = 0; p < V; ++p)vis[p] = 0;
+
+    vector < int > comp(V + 10, -1);
+    int scc(0);
+
+    for(int idx = (int)ord.size() - 1; idx >= 0; --idx){
+        int p(ord[idx]);
+        if(vis[p])continue;
+
+        stk.clear();
+        stk.push_back(p);
+        vis[p] = 1, comp[p] = scc;
+
+        while((int)stk.size()){
+            int u(stk.back());
+            stk.pop_back();
+            for(auto i = rHead[u]; i; i = i->nxt)
+                if(!vis[i->to])vis[i->to] = 1, comp[i->to] = scc, stk.push_back(i->to);
+        }
+
+        ++scc;
+    }
+
+    for(int i = 0; i < N; ++i){
+        int p(i << 1);
+        if(comp[p] == comp[p ^ 1]){
+            printf("s UNSATISFIABLE\n");
+            return 0;
         }
     }
-    
-    int k(0), len(1);
-    while(len < dPrime)len <<= 1, ++k;
-    
-    printf("%d\n", k + 1);
-    
-    // fprintf(stderr, "Time: %.6lf\n", (double)clock() / CLOCKS_PER_SEC);
+
+    printf("s SATISFIABLE\n");
+    printf("v ");
+    for(int i = 0; i < N; ++i){
+        int p(i << 1);
+        int val = comp[p] > comp[p ^ 1] ? (i + 1) : -(i + 1);
+        printf("%d ", val);
+    }
+    printf("0\n");
+
     return 0;
 }
 
